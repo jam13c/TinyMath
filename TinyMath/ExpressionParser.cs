@@ -8,7 +8,7 @@ namespace TinyMath
 {
     public static class ExpressionParser
     {
-        public static IExpression Parse(ReadOnlySpan<char> expr)
+        public static IExpression Parse(string expr)
         {
             var tokenizer = new Tokenizer(expr);
             var interpreter = new Interpreter(tokenizer);

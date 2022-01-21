@@ -2,28 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace TinyMath
 {
-    public ref struct Tokenizer
-    {        
+    public class Tokenizer
+    {
 
-        public Tokenizer(ReadOnlySpan<char> expr)
+        static Regex IsNumber = new Regex(@"[0-9.]");
+        static Regex IsLetterOrUnderscore = new Regex("[0-9a-zA-Z_]");
+
+        public Tokenizer(string expr)
         {
             _expr = expr;
             NextToken();
         }
 
-        private ReadOnlySpan<char> _expr = ReadOnlySpan<char>.Empty;
+        private string _expr = String.Empty;
         private int _currentPos = 0;
         private Token _currentToken = Token.EOF;
         private decimal _number = 0m;
-        private ReadOnlySpan<char> _identifier = ReadOnlySpan<char>.Empty;
+        private string _identifier = String.Empty;
 
         public Token CurrentToken => _currentToken;
         public decimal Number => _number;
-        public ReadOnlySpan<char> Identifier => _identifier;
+        public string Identifier => _identifier;
         public int CurrentPosition => _currentPos;
 
         public override string ToString() => _expr.ToString();
@@ -41,92 +45,92 @@ namespace TinyMath
 
         public void NextToken()
         {
-            var currentChar = _currentPos < _expr.Length ? _expr[_currentPos] : Constants.NullChar;
+            var currentChar = _currentPos < _expr.Length ? _expr.Substring(_currentPos,1) : String.Empty;
             // skip whitespace
-            while (char.IsWhiteSpace(currentChar))
+            while (currentChar != String.Empty && string.IsNullOrWhiteSpace(currentChar))
             {
                 NextChar();
-                currentChar = _currentPos < _expr.Length ? _expr[_currentPos] : Constants.NullChar;
+                currentChar = _currentPos < _expr.Length ? _expr.Substring(_currentPos, 1) : String.Empty;
             }
 
             switch(currentChar)
             {
-                case Constants.NullChar:
+                case "":
                     _currentToken = Token.EOF;
                     return;
 
-                case Constants.Add:
+                case "+":
                     NextChar();
                     _currentToken = Token.Add;
                     return;
 
-                case Constants.Subtract:
+                case "-":
                     NextChar();
                     _currentToken = Token.Subtract;
                     return;
 
-                case Constants.Multiply:
+                case "*":
                     NextChar();
                     _currentToken = Token.Multiply;
                     return;
 
-                case Constants.Divide:
+                case "/":
                     NextChar();
                     _currentToken = Token.Divide;
                     return;
 
-                case Constants.Pow:
+                case "^":
                     NextChar();
                     _currentToken = Token.Pow;
                     return;
 
-                case Constants.LeftParen:
+                case "(":
                     NextChar();
                     _currentToken = Token.OpenParens;
                     return;
 
-                case Constants.RightParen:
+                case ")":
                     NextChar();
                     _currentToken = Token.CloseParens;
                     return;
 
-                case Constants.Comma:
+                case ",":
                     NextChar();
                     _currentToken = Token.Comma;
                     return;
 
             }
 
-            if(char.IsDigit(currentChar) || currentChar == '.')
+            if(IsNumber.IsMatch(currentChar))
             {
                 bool hasDecimal = false;
                 int len = 0;
-                while(char.IsDigit(currentChar) || (!hasDecimal && currentChar == Constants.DecimalPoint))
+                while(IsNumber.IsMatch(currentChar) || (!hasDecimal && currentChar == "."))
                 {                    
                     len++;
                     if (_currentPos + len == _expr.Length)
                         break;
-                    hasDecimal = currentChar == Constants.DecimalPoint;
-                    currentChar = _expr[_currentPos + len];
+                    hasDecimal = currentChar == ".";
+                    currentChar = _expr.Substring(_currentPos + len,1);
                 }
-                _number = decimal.Parse(_expr.Slice(_currentPos, len));
+                _number = decimal.Parse(_expr.Substring(_currentPos, len));
                 _currentToken = Token.Number;
                 Advance(len);
                 return;
             }
 
-            if(char.IsLetter(currentChar) || currentChar == Constants.Underscore)
+            if(IsLetterOrUnderscore.IsMatch(currentChar))
             {
                 var len = 0;
-                while(char.IsLetter(currentChar) || char.IsNumber(currentChar) || currentChar == Constants.Underscore)
+                while(IsLetterOrUnderscore.IsMatch(currentChar))
                 {                   
                     len++;
                     if (_currentPos + len == _expr.Length)
                         break;
-                    currentChar = _expr[_currentPos + len];
+                    currentChar = _expr.Substring(_currentPos + len,1);
                 }
 
-                _identifier = _expr.Slice(_currentPos, len);
+                _identifier = _expr.Substring(_currentPos, len);
                 _currentToken = Token.Identifier;
                 Advance(len);
                 return;

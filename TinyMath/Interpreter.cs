@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TinyMath
 {
-    public ref struct Interpreter
+    public class Interpreter
     {
         public Interpreter(Tokenizer tokenizer)
         {
@@ -37,8 +37,8 @@ namespace TinyMath
                 char op = Constants.NullChar;
                 switch (_tokenizer.CurrentToken)
                 {
-                    case Token.Add: op = Constants.Add; break;
-                    case Token.Subtract: op = Constants.Subtract; break;
+                    case Token.Add: op = '+'; break;
+                    case Token.Subtract: op = '-'; break;
                     default: return lhs;
                 }
 
@@ -59,8 +59,8 @@ namespace TinyMath
                 char op = Constants.NullChar;
                 switch (_tokenizer.CurrentToken)
                 {
-                    case Token.Multiply: op = Constants.Multiply; break;
-                    case Token.Divide: op = Constants.Divide; break;
+                    case Token.Multiply: op = '*'; break;
+                    case Token.Divide: op = '/'; break;
                     default: return lhs;
                 }
 
@@ -81,7 +81,7 @@ namespace TinyMath
                 char op = Constants.NullChar;
                 switch (_tokenizer.CurrentToken)
                 {
-                    case Token.Pow: op = Constants.Pow; break;
+                    case Token.Pow: op = '^'; break;
                     default: return lhs;
                 }
 
