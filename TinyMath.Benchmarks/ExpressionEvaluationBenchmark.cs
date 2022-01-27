@@ -14,7 +14,8 @@ namespace TinyMath.Benchmarks
     [MemoryDiagnoser]
     public class ExpressionEvaluationBenchmark
     {
-        readonly static string ExpressionToUse = "foo * (bar / 10) + 42";
+        [Params("foo * (bar / 10) + 42","1 * 2 + 3 -4 / 5 ^ 6", "foo * foo * foo / bar * bar + foo - bar + foo - bar + foo - bar - bar + foo - bar + foo - bar - bar + foo - bar + foo - bar - bar + foo - bar + foo - bar - bar + foo - bar + foo - bar - bar + foo - bar + foo - bar - bar + foo - bar + foo - bar - bar + foo - bar + foo - bar - bar + foo - bar + foo - bar ")]
+        public string ExpressionToUse { get; set; }
 
         [Benchmark(Baseline = true)]
         public decimal TinyMath()
